@@ -1,0 +1,936 @@
+﻿{
+    "name":  "My workflow",
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "updates":  "message",
+                                         "additionalFields":  {
+                                                                  "download":  true
+                                                              }
+                                     },
+                      "type":  "n8n-nodes-base.telegramTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "id":  "74916332-01ad-45e9-83ff-b27f0fb2d241",
+                      "name":  "Telegram Trigger",
+                      "webhookId":  "82af6419-6de9-44af-95dc-05eacf1b6fc6"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "3d2610cf-b843-49a6-9a5d-01c348095df5",
+                                                                                     "name":  "ticket_id",
+                                                                                     "value":  "=TCK-{{$now.format(\u0027yyyyMMdd-HHmmss\u0027)}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "c28cf094-dafa-46ce-bd0b-120a3a7a347c",
+                                                                                     "name":  "created_at",
+                                                                                     "value":  "={{$now.format(\u0027yyyy-MM-dd HH:mm:ss\u0027)}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "6cb4404e-dde2-4f88-b263-045f07e21d4b",
+                                                                                     "name":  "channel",
+                                                                                     "value":  "Telegram",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "a7cdc1eb-55fc-4522-b1ff-d86a4d584eb7",
+                                                                                     "name":  "customer_name",
+                                                                                     "value":  "={{$json.message.from.first_name || \"Unknown\"}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "578954f1-91d1-4efe-89b8-0e02ebbb91fe",
+                                                                                     "name":  "=customer_contact",
+                                                                                     "value":  "={{\"@\" + ($json.message.from.username || $json.message.chat.id)}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "cb33e93c-bf15-45ca-ad68-c0496f6b76aa",
+                                                                                     "name":  "raw_message",
+                                                                                     "value":  "={{$json.message.text || $json.message.caption || \"\"}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "881a056b-e27e-4383-9cb6-aff268008587",
+                                                                                     "name":  "telegram_chat_id",
+                                                                                     "value":  "={{$json.message.chat.id}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "c8ae73a2-7065-4670-8644-a19c2ab95cd7",
+                                                                                     "name":  "message.message_id",
+                                                                                     "value":  "={{$json.message.message_id}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "212c8a36-24f2-4efb-8aac-da7069e6b1f3",
+                                                                                     "name":  "has_attachment",
+                                                                                     "value":  "={{!!($json.message.photo || $json.message.document || $json.message.voice || $json.message.video || $json.message.audio)}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "ac389027-8ce7-4ad2-8bd5-a7efd2d42b5d",
+                                                                                     "name":  "attachment_type",
+                                                                                     "value":  "={{$json.message.photo ? \"photo\" : $json.message.document ? \"document\" : $json.message.voice ? \"voice\" : $json.message.video ? \"video\" : $json.message.audio ? \"audio\" : \"none\"}}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "dc0e0098-827c-4c7c-8ce6-751e6ea715e3",
+                                                                                     "name":  "attachment_relevant",
+                                                                                     "value":  "unknown",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "ee1ae04a-6535-47e8-a962-886d021ea0d3",
+                                                                                     "name":  "status",
+                                                                                     "value":  "New",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "26990292-25a1-4f75-92bf-649dbb6e598d",
+                                                                                     "name":  "last_updated",
+                                                                                     "value":  "={{$now.format(\u0027yyyy-MM-dd HH:mm:ss\u0027)}}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       208,
+                                       0
+                                   ],
+                      "id":  "35ee575b-cfad-46f7-a03c-c1be302cb67b",
+                      "name":  "Normalize Ticket Data"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "YOUR_GOOGLE_SHEET_ID",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "AI Customer Support Triage Desk",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Tickets",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "ticket_id":  "={{ $json.ticket_id }}",
+                                                                       "created_at":  "={{ $json.created_at }}",
+                                                                       "channel":  "={{ $json.channel }}",
+                                                                       "customer_name":  "={{ $json.customer_name }}",
+                                                                       "customer_contact":  "={{ $json.customer_contact }}",
+                                                                       "raw_message":  "={{ $json.raw_message }}",
+                                                                       "telegram_chat_id":  "={{ $json.telegram_chat_id }}",
+                                                                       "telegram_message_id":  "={{ $json.message.message_id }}",
+                                                                       "has_attachment":  "={{ $json.has_attachment }}",
+                                                                       "attachment_type":  "={{ $json.attachment_type }}",
+                                                                       "attachment_relevant":  "={{ $json.attachment_relevant }}",
+                                                                       "last_updated":  "={{ $json.last_updated }}",
+                                                                       "status":  "={{ $json.status }}",
+                                                                       "intent":  "={{ $json.intent }}",
+                                                                       "department":  "={{ $json.department }}",
+                                                                       "sentiment":  "={{ $json.sentiment }}",
+                                                                       "urgency":  "={{ $json.urgency }}",
+                                                                       "confidence":  "={{ $json.confidence }}",
+                                                                       "escalation_required":  "={{ $json.escalation_required }}",
+                                                                       "draft_reply":  "={{ $json.draft_reply }}"
+                                                                   },
+                                                         "matchingColumns":  null,
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "ticket_id",
+                                                                            "displayName":  "ticket_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "created_at",
+                                                                            "displayName":  "created_at",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "channel",
+                                                                            "displayName":  "channel",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "customer_name",
+                                                                            "displayName":  "customer_name",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "customer_contact",
+                                                                            "displayName":  "customer_contact",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "raw_message",
+                                                                            "displayName":  "raw_message",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "intent",
+                                                                            "displayName":  "intent",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "department",
+                                                                            "displayName":  "department",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "sentiment",
+                                                                            "displayName":  "sentiment",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "urgency",
+                                                                            "displayName":  "urgency",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "confidence",
+                                                                            "displayName":  "confidence",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "escalation_required",
+                                                                            "displayName":  "escalation_required",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "status",
+                                                                            "displayName":  "status",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "draft_reply",
+                                                                            "displayName":  "draft_reply",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "approved_reply",
+                                                                            "displayName":  "approved_reply",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "assigned_to",
+                                                                            "displayName":  "assigned_to",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "sla_due_at",
+                                                                            "displayName":  "sla_due_at",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "last_updated",
+                                                                            "displayName":  "last_updated",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "telegram_chat_id",
+                                                                            "displayName":  "telegram_chat_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "telegram_message_id",
+                                                                            "displayName":  "telegram_message_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "has_attachment",
+                                                                            "displayName":  "has_attachment",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "attachment_type",
+                                                                            "displayName":  "attachment_type",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "attachment_relevant",
+                                                                            "displayName":  "attachment_relevant",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       1200,
+                                       0
+                                   ],
+                      "id":  "57a7305f-cebd-44a9-94fe-b34a49be2ba9",
+                      "name":  "Add Ticket Row"
+                  },
+                  {
+                      "parameters":  {
+                                         "modelId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "models/gemini-3-flash-preview"
+                                                     },
+                                         "messages":  {
+                                                          "values":  {
+                                                                         "content":  "=You are a customer support triage assistant. Classify customer messages accurately and conservatively. Mark escalation_required as true only for high-risk cases: billing/payment problems blocking access, refunds, legal/safety issues, angry or threatening customers, suspected account takeover, security incidents, service outages, or critical business impact. Do not escalate routine password reset or basic how-to questions unless the customer reports suspicious activity, urgent business impact, or inability to recover access after trying the normal steps.\n\nReturn only valid JSON using this structure:\n{\n  \"intent\": \"\",\n  \"department\": \"\",\n  \"sentiment\": \"\",\n  \"urgency\": \"\",\n  \"confidence\": 0,\n  \"escalation_required\": false,\n  \"reasoning_summary\": \"\",\n  \"missing_information\": []\n}\n\nAllowed urgency values: Low, Medium, High, Critical.\nAllowed departments: Billing, Technical Support, Sales, Account Management, General Support.\n\nCustomer message:\n{{$json.raw_message}}\n\nCustomer metadata:\nName: {{$json.customer_name}}\nChannel: {{$json.channel}}\n\nClassify the message for support routing. Keep reasoning_summary short. Do not reveal chain-of-thought."
+                                                                     }
+                                                      },
+                                         "jsonOutput":  true,
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.googleGemini",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       384,
+                                       0
+                                   ],
+                      "id":  "7c997918-17a4-4522-bcac-7ddecb3778c2",
+                      "name":  "AI Classification"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const ai = $input.first().json;\nconst original = $(\u0027Normalize Ticket Data\u0027).first().json;\n\nconst text = ai.content.parts[0].text;\nconst parsed = JSON.parse(text);\n\nreturn [\n  {\n    json: {\n      ...original,\n      intent: parsed.intent,\n      department: parsed.department,\n      sentiment: parsed.sentiment,\n      urgency: parsed.urgency,\n      confidence: parsed.confidence,\n      escalation_required: parsed.escalation_required,\n      reasoning_summary: parsed.reasoning_summary,\n      missing_information: Array.isArray(parsed.missing_information)\n        ? parsed.missing_information.join(\", \")\n        : parsed.missing_information\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       752,
+                                       0
+                                   ],
+                      "id":  "1867e352-f5ba-47d3-8b60-b064aed8e450",
+                      "name":  "Parse Gemini Classification"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "YOUR_GOOGLE_SHEET_ID",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "AI Customer Support Triage Desk",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  2002834453,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Knowledge Base",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=2002834453"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       720,
+                                       -192
+                                   ],
+                      "id":  "08e7a5df-79ef-46c6-8520-a7bcb8e58d82",
+                      "name":  "Read Knowledge Base"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const ticket = $(\u0027Parse Gemini Classification\u0027).first().json;\nconst kbRows = $input.all().map(item =\u003e item.json);\n\nconst message = `${ticket.raw_message} ${ticket.intent} ${ticket.department}`.toLowerCase();\n\nconst scored = kbRows.map(row =\u003e {\n  const keywords = String(row.keywords || \"\")\n    .toLowerCase()\n    .split(\",\")\n    .map(k =\u003e k.trim())\n    .filter(Boolean);\n\n  const score = keywords.reduce((count, keyword) =\u003e {\n    return message.includes(keyword) ? count + 1 : count;\n  }, 0);\n\n  return { ...row, match_score: score };\n});\n\nconst matches = scored\n  .filter(row =\u003e row.match_score \u003e 0)\n  .sort((a, b) =\u003e b.match_score - a.match_score)\n  .slice(0, 3);\n\nreturn [\n  {\n    json: {\n      ...ticket,\n      knowledge_base_matches: matches.length\n        ? matches.map(row =\u003e\n            `${row.article_id}: ${row.topic}\\nAnswer: ${row.answer}\\nEscalation rule: ${row.escalation_rule}`\n          ).join(\"\\n\\n\")\n        : \"No relevant knowledge base article found.\"\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       896,
+                                       -192
+                                   ],
+                      "id":  "6f3acc8d-1a13-4af0-a055-47344102aa52",
+                      "name":  "Match Knowledge Base"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1024,
+                                       80
+                                   ],
+                      "id":  "aeab8ee1-b2d2-4de5-b49d-3ecaccca9df7",
+                      "name":  "Google Gemini Chat Model"
+                  },
+                  {
+                      "parameters":  {
+                                         "modelId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "models/gemini-3-flash-preview"
+                                                     },
+                                         "messages":  {
+                                                          "values":  {
+                                                                         "content":  "=You are a support reply assistant. Draft helpful, concise customer support replies using only the approved knowledge base content provided. Do not invent policies, refunds, account changes, technical guarantees, or timelines. If the knowledge base does not contain enough information, ask for clarification or recommend escalation.\n\nReturn only valid JSON:\n{\n  \"reply_subject\": \"\",\n  \"reply_body\": \"\",\n  \"used_knowledge_base_ids\": [],\n  \"reply_confidence\": 0,\n  \"needs_human_review\": true,\n  \"internal_note\": \"\"\n}\n\nTicket:\nTicket ID: {{ $json.ticket_id }}\nCustomer name: {{ $json.customer_name }}\nMessage: {{ $json.raw_message }}\nIntent: {{ $json.intent }}\nDepartment: {{ $json.department }}\nUrgency: {{ $json.urgency }}\nSentiment: {{ $json.sentiment }}\nMissing information: {{ $json.missing_information }}\n\nApproved knowledge base content:\n{{ $json.knowledge_base_matches }}\n\nDraft a reply. If escalation is required or the customer is blocked, do not pretend the issue is solved. Keep the reply professional and safe."
+                                                                     }
+                                                      },
+                                         "jsonOutput":  true,
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.googleGemini",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       1072,
+                                       -192
+                                   ],
+                      "id":  "4aa6006d-35ec-43f2-9a27-5386d91a445f",
+                      "name":  "Draft AI Reply"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const ai = $input.first().json;\nconst ticket = $(\u0027Match Knowledge Base\u0027).first().json;\n\nconst text = ai.content.parts[0].text;\nconst parsed = JSON.parse(text);\n\nreturn [\n  {\n    json: {\n      ...ticket,\n      reply_subject: parsed.reply_subject,\n      draft_reply: parsed.reply_body,\n      used_knowledge_base_ids: Array.isArray(parsed.used_knowledge_base_ids)\n        ? parsed.used_knowledge_base_ids.join(\", \")\n        : parsed.used_knowledge_base_ids,\n      reply_confidence: parsed.reply_confidence || parsed.confidence || \"Not provided\",\n      needs_human_review: parsed.needs_human_review,\n      internal_note: parsed.internal_note\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1376,
+                                       -192
+                                   ],
+                      "id":  "4e0dd39b-2bfe-43a8-aef0-1f89b73e009f",
+                      "name":  "Parse Draft Reply"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "loose",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "debbc6d1-9e8c-4210-94cb-1c520d566b89",
+                                                                                   "leftValue":  "={{ $json.urgency }}",
+                                                                                   "rightValue":  "High",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals",
+                                                                                                    "name":  "filter.operator.equals"
+                                                                                                }
+                                                                               },
+                                                                               {
+                                                                                   "id":  "923f90fe-c1c2-4c95-a084-8ce05f7933b0",
+                                                                                   "leftValue":  "={{ $json.urgency }}",
+                                                                                   "rightValue":  "Critical",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals",
+                                                                                                    "name":  "filter.operator.equals"
+                                                                                                }
+                                                                               },
+                                                                               {
+                                                                                   "id":  "5998a645-d6f8-4726-a39e-08efccdf508d",
+                                                                                   "leftValue":  "={{ $json.escalation_required }}",
+                                                                                   "rightValue":  true,
+                                                                                   "operator":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "operation":  "equals"
+                                                                                                }
+                                                                               },
+                                                                               {
+                                                                                   "id":  "9faa6918-1e53-4ec0-8238-cabb999df91d",
+                                                                                   "leftValue":  "={{ $json.confidence }}",
+                                                                                   "rightValue":  0.7,
+                                                                                   "operator":  {
+                                                                                                    "type":  "number",
+                                                                                                    "operation":  "lt"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "or"
+                                                        },
+                                         "looseTypeValidation":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       1584,
+                                       -160
+                                   ],
+                      "id":  "789b1c50-2613-4eca-ab6e-af80adf5905a",
+                      "name":  "Escalation Check"
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "YOUR_ADMIN_CHAT_ID",
+                                         "text":  "=ðŸš¨ Escalated support ticket\n\nTicket: {{ $json.ticket_id }}\nCustomer: {{ $json.customer_name }}\nUrgency: {{ $json.urgency }}\nDepartment: {{ $json.department }}\nIntent: {{ $json.intent }}\n\nMessage:\n{{ $json.raw_message }}\n\nReason:\nEscalation required: {{ $json.escalation_required }}\nClassification confidence: {{ $json.confidence }}\nReply confidence: {{ $json.reply_confidence || \"Not provided\" }}\n\nDraft reply:\n{{ $json.draft_reply }}",
+                                         "additionalFields":  {
+
+                                                              }
+                                     },
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       1792,
+                                       -160
+                                   ],
+                      "id":  "fdcdb98d-73eb-4088-8377-012d72cf03c3",
+                      "name":  "Send Escalation Alert",
+                      "webhookId":  "7fdc9420-734d-4d06-af8c-f883aa9bef53"
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "YOUR_ADMIN_CHAT_ID",
+                                         "text":  "=SUPPORT REPLY READY FOR APPROVAL\n\nTicket: {{ $json.ticket_id }}\nCustomer: {{ $json.customer_name }}\nIntent: {{ $json.intent }}\nUrgency: {{ $json.urgency }}\nSentiment: {{ $json.sentiment }}\n\nCustomer message:\n{{ $json.raw_message }}\n\nDraft reply:\n{{ $json.draft_reply }}\n\nActions:\nReply APPROVE {{ $json.ticket_id }} to send.\nReply ESCALATE {{ $json.ticket_id }} to assign to a human.\nReply REJECT {{ $json.ticket_id }} to hold the draft.",
+                                         "additionalFields":  {
+
+                                                              }
+                                     },
+                      "type":  "n8n-nodes-base.telegram",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       1840,
+                                       -16
+                                   ],
+                      "id":  "7cbfc761-7b93-435b-9e55-d2a504fdf7a1",
+                      "name":  "Approval",
+                      "webhookId":  "4740612b-fff6-4199-80e1-21df61920079"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "YOUR_GOOGLE_SHEET_ID",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "AI Customer Support Triage Desk",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  457951915,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Audit Log",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=457951915"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "event_id":  "={{ \"EVT-\" + $now.format(\u0027yyyyMMdd-HHmmss\u0027) }}",
+                                                                       "timestamp":  "={{ $now.format(\u0027yyyy-MM-dd HH:mm:ss\u0027) }}",
+                                                                       "ticket_id":  "={{ $json.ticket_id }}",
+                                                                       "event_type":  "TICKET_ESCALATED",
+                                                                       "actor":  "n\u0026n",
+                                                                       "details":  "={{ \"Ticket escalated to admin. Urgency: \" + $json.urgency + \", Department: \" + $json.department }}"
+                                                                   },
+                                                         "matchingColumns":  null,
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "event_id",
+                                                                            "displayName":  "event_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "timestamp",
+                                                                            "displayName":  "timestamp",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "ticket_id",
+                                                                            "displayName":  "ticket_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "event_type",
+                                                                            "displayName":  "event_type",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "details",
+                                                                            "displayName":  "details",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "actor",
+                                                                            "displayName":  "actor",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       2000,
+                                       -160
+                                   ],
+                      "id":  "25f6e5e5-4f0c-4be1-807d-0644af27e786",
+                      "name":  "Audit Log - Escalated"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "YOUR_GOOGLE_SHEET_ID",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "AI Customer Support Triage Desk",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  457951915,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Audit Log",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=457951915"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "event_id":  "=EVT-{{$now.format(\u0027yyyyMMdd-HHmmss\u0027)}}",
+                                                                       "timestamp":  "={{$now.format(\u0027yyyy-MM-dd HH:mm:ss\u0027)}}",
+                                                                       "ticket_id":  "={{$json.ticket_id}}",
+                                                                       "event_type":  "APPROVAL_REQUESTED",
+                                                                       "actor":  "n\u0026n",
+                                                                       "details":  "={{ \"Approval requested for draft reply. Intent: \" + $json.intent + \", Urgency: \" + $json.urgency }}"
+                                                                   },
+                                                         "matchingColumns":  null,
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "event_id",
+                                                                            "displayName":  "event_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "timestamp",
+                                                                            "displayName":  "timestamp",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "ticket_id",
+                                                                            "displayName":  "ticket_id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "event_type",
+                                                                            "displayName":  "event_type",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "details",
+                                                                            "displayName":  "details",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "actor",
+                                                                            "displayName":  "actor",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       2032,
+                                       -16
+                                   ],
+                      "id":  "78462f74-66e0-425e-9333-419146a16ea1",
+                      "name":  "Audit Log - Approval Requested"
+                  }
+              ],
+    "connections":  {
+                        "Telegram Trigger":  {
+                                                 "main":  {
+                                                              "node":  "Normalize Ticket Data",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                             },
+                        "Normalize Ticket Data":  {
+                                                      "main":  {
+                                                                   "node":  "AI Classification",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                  },
+                        "Add Ticket Row":  {
+                                               "main":  {
+                                                            "node":  "Escalation Check",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                           },
+                        "AI Classification":  {
+                                                  "main":  {
+                                                               "node":  "Parse Gemini Classification",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                              },
+                        "Parse Gemini Classification":  {
+                                                            "main":  {
+                                                                         "node":  "Read Knowledge Base",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                        },
+                        "Read Knowledge Base":  {
+                                                    "main":  {
+                                                                 "node":  "Match Knowledge Base",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                },
+                        "Match Knowledge Base":  {
+                                                     "main":  {
+                                                                  "node":  "Draft AI Reply",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                 },
+                        "Draft AI Reply":  {
+                                               "main":  {
+                                                            "node":  "Parse Draft Reply",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                           },
+                        "Parse Draft Reply":  {
+                                                  "main":  {
+                                                               "node":  "Add Ticket Row",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                              },
+                        "Escalation Check":  {
+                                                 "main":  [
+                                                              {
+                                                                  "node":  "Send Escalation Alert",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              },
+                                                              {
+                                                                  "node":  "Approval",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                             },
+                        "Approval":  {
+                                         "main":  {
+                                                      "node":  "Audit Log - Approval Requested",
+                                                      "type":  "main",
+                                                      "index":  0
+                                                  }
+                                     },
+                        "Send Escalation Alert":  {
+                                                      "main":  {
+                                                                   "node":  "Audit Log - Escalated",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                  },
+                        "Audit Log - Approval Requested":  {
+                                                               "main":  null
+                                                           }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "pinData":  {
+
+                },
+    "triggerCount":  0,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             }
+}

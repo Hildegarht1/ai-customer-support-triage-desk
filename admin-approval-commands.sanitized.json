@@ -1,0 +1,183 @@
+﻿{
+    "name":  "AI Support Desk - Admin Commands",
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "updates":  "message",
+                                         "additionalFields":  {
+
+                                                              }
+                                     },
+                      "type":  "n8n-nodes-base.telegramTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "id":  "2adacd51-d450-4880-a960-24c464c26049",
+                      "name":  "Telegram Trigger",
+                      "webhookId":  "43fbe118-3ba1-4da3-a6eb-1a3f38d37c57"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const message = $json.message?.text || \"\";\nconst chatId = String($json.message?.chat?.id || \"\");\nconst adminChatId = \"YOUR_ADMIN_CHAT_ID\";\n\nif (chatId !== adminChatId) {\n  return [\n    {\n      json: {\n        valid_command: false,\n        error: \"Unauthorized chat\",\n        chat_id: chatId,\n        raw_command: message\n      }\n    }\n  ];\n}\n\nconst parts = message.trim().split(/\\s+/);\nconst action = (parts[0] || \"\").toUpperCase();\nconst ticketId = parts[1] || \"\";\n\nconst allowedActions = [\"APPROVE\", \"REJECT\", \"ESCALATE\"];\n\nconst validCommand =\n  allowedActions.includes(action) \u0026\u0026\n  /^TCK-\\d{8}-\\d{6}$/.test(ticketId);\n\nreturn [\n  {\n    json: {\n      valid_command: validCommand ? \"true\" : \"false\",\n      action,\n      ticket_id: ticketId,\n      admin_chat_id: chatId,\n      raw_command: message,\n      error: validCommand ? \"\" : \"Invalid command format\"\n    }\n  }\n];"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       208,
+                                       0
+                                   ],
+                      "id":  "20f231c5-7b88-4b21-b7e5-2e413dfa851e",
+                      "name":  "Parse Admin Command"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  {
+                                                                               "id":  "388b7c24-f0e1-436b-9ab2-3771fc9c0db3",
+                                                                               "leftValue":  "={{ $json.valid_command }}",
+                                                                               "rightValue":  "true",
+                                                                               "operator":  {
+                                                                                                "type":  "string",
+                                                                                                "operation":  "equals"
+                                                                                            }
+                                                                           },
+                                                            "combinator":  "and"
+                                                        },
+                                         "looseTypeValidation":  "",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       416,
+                                       0
+                                   ],
+                      "id":  "d069053f-a213-44c8-ac5d-9ad887c8db98",
+                      "name":  "Valid Command Check"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "YOUR_GOOGLE_SHEET_ID",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "AI Customer Support Triage Desk",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Tickets",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+                                                       },
+                                         "filtersUI":  {
+                                                           "values":  {
+                                                                          "lookupColumn":  "ticket_id",
+                                                                          "lookupValue":  "={{ $json.ticket_id }}"
+                                                                      }
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       624,
+                                       -96
+                                   ],
+                      "id":  "bd813fe0-ddf1-4ebe-96a1-ea1cd99f5c20",
+                      "name":  "Lookup Ticket"
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  {
+                                                                      "conditions":  {
+                                                                                         "options":  {
+                                                                                                         "caseSensitive":  true,
+                                                                                                         "leftValue":  "",
+                                                                                                         "typeValidation":  "strict",
+                                                                                                         "version":  3
+                                                                                                     },
+                                                                                         "conditions":  {
+                                                                                                            "leftValue":  "",
+                                                                                                            "rightValue":  "",
+                                                                                                            "operator":  {
+                                                                                                                             "type":  "string",
+                                                                                                                             "operation":  "equals"
+                                                                                                                         },
+                                                                                                            "id":  "5879d35c-5156-4dcc-864b-6f6fdec0bf45"
+                                                                                                        },
+                                                                                         "combinator":  "and"
+                                                                                     }
+                                                                  }
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       832,
+                                       -96
+                                   ],
+                      "id":  "5c985fa9-11ec-4e24-87a1-a0a0f040a290",
+                      "name":  "Route Admin Action"
+                  }
+              ],
+    "connections":  {
+                        "Telegram Trigger":  {
+                                                 "main":  {
+                                                              "node":  "Parse Admin Command",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                             },
+                        "Parse Admin Command":  {
+                                                    "main":  {
+                                                                 "node":  "Valid Command Check",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                },
+                        "Valid Command Check":  {
+                                                    "main":  {
+                                                                 "node":  "Lookup Ticket",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                },
+                        "Lookup Ticket":  {
+                                              "main":  {
+                                                           "node":  "Route Admin Action",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                          }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "pinData":  {
+
+                },
+    "triggerCount":  0,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             }
+}
