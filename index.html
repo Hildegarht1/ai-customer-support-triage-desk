@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Customer Support Triage Desk</title>
+    <meta
+      name="description"
+      content="A webhook-based AI support automation built with n8n, Telegram, Google Sheets, and LLM workflow logic."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17212b;
+        --muted: #5d6978;
+        --line: #d8dee7;
+        --soft: #f4f7fb;
+        --panel: #ffffff;
+        --blue: #2458a6;
+        --green: #1f7a5b;
+        --amber: #a76113;
+        --red: #b43d35;
+        --shadow: 0 14px 40px rgba(20, 33, 47, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: #fbfcfe;
+        line-height: 1.55;
+      }
+
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .wrap {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+      }
+
+      nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 750;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: white;
+        background: var(--ink);
+        font-size: 13px;
+        letter-spacing: 0;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        font-size: 14px;
+      }
+
+      .hero {
+        padding: 58px 0 34px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+        gap: 36px;
+        align-items: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(38px, 6vw, 68px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        margin: 22px 0 0;
+        max-width: 720px;
+        color: var(--muted);
+        font-size: 19px;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .pill {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 999px;
+        padding: 7px 12px;
+        font-size: 13px;
+        color: #354253;
+      }
+
+      .actions {
+        margin-top: 28px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        border-radius: 8px;
+        padding: 9px 14px;
+        font-weight: 700;
+        border: 1px solid var(--ink);
+      }
+
+      .button.primary {
+        background: var(--ink);
+        color: white;
+      }
+
+      .button.secondary {
+        background: white;
+        color: var(--ink);
+      }
+
+      .demo-frame {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .demo-titlebar {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--line);
+        background: #f7f9fc;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 99px;
+        background: #aab4c2;
+      }
+
+      .demo-body {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .message,
+      .ticket {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: white;
+      }
+
+      .message strong,
+      .ticket strong {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .tag-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .tag {
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 12px;
+        font-weight: 700;
+        background: var(--soft);
+      }
+
+      .tag.high {
+        color: var(--red);
+        background: #fff0ee;
+      }
+
+      .tag.billing {
+        color: var(--blue);
+        background: #eef4ff;
+      }
+
+      .tag.escalate {
+        color: var(--amber);
+        background: #fff5e8;
+      }
+
+      section {
+        padding: 42px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: clamp(26px, 4vw, 40px);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .section-lead {
+        margin: 0 0 24px;
+        color: var(--muted);
+        max-width: 760px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        padding: 18px;
+        min-height: 150px;
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .flow-step {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        padding: 14px;
+        min-height: 116px;
+        position: relative;
+      }
+
+      .flow-step::after {
+        content: "";
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        width: 10px;
+        height: 1px;
+        background: var(--line);
+      }
+
+      .flow-step:last-child::after {
+        display: none;
+      }
+
+      .flow-step b {
+        display: block;
+        color: var(--blue);
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+
+      .flow-step span {
+        display: block;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .table {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+        font-size: 14px;
+      }
+
+      th {
+        background: #f7f9fc;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .callout {
+        border-left: 4px solid var(--green);
+        background: #f0faf6;
+        padding: 16px;
+        border-radius: 8px;
+        color: #173f32;
+      }
+
+      footer {
+        padding: 34px 0 46px;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+      }
+
+      @media (max-width: 900px) {
+        .hero-grid,
+        .split {
+          grid-template-columns: 1fr;
+        }
+
+        .grid,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+
+        .flow-step::after {
+          display: none;
+        }
+
+        nav {
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 14px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="wrap" aria-label="Project navigation">
+        <a class="brand" href="#top" aria-label="AI Customer Support Triage Desk home">
+          <span class="brand-mark">AI</span>
+          <span>Support Triage Desk</span>
+        </a>
+        <div class="nav-links">
+          <a href="#workflow">Workflow</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#outcomes">Outcomes</a>
+          <a href="README.md">Technical README</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <h1>AI Customer Support Triage Desk</h1>
+            <p class="lead">
+              A webhook-based automation that receives support messages, classifies urgency and intent,
+              searches a knowledge base, drafts safe replies, routes escalations, and writes audit logs.
+            </p>
+            <div class="meta" aria-label="Project stack">
+              <span class="pill">n8n</span>
+              <span class="pill">Docker</span>
+              <span class="pill">Telegram Webhooks</span>
+              <span class="pill">Google Sheets</span>
+              <span class="pill">LLM / JSON Parsing</span>
+            </div>
+            <div class="actions">
+              <a class="button primary" href="#workflow">View workflow</a>
+              <a class="button secondary" href="workflows/ticket-intake-and-triage.sanitized.json">
+                Workflow export
+              </a>
+            </div>
+          </div>
+
+          <aside class="demo-frame" aria-label="Demo preview">
+            <div class="demo-titlebar">
+              <span>Live workflow behavior</span>
+              <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+            <div class="demo-body">
+              <div class="message">
+                <strong>Incoming customer message</strong>
+                I upgraded my plan yesterday but my account still says Free. I need this fixed today because
+                my team cannot access the automation dashboard.
+              </div>
+              <div class="ticket">
+                <strong>Generated support ticket</strong>
+                Intent: Subscription status issue
+                <div class="tag-row">
+                  <span class="tag billing">Billing</span>
+                  <span class="tag high">High urgency</span>
+                  <span class="tag escalate">Escalate</span>
+                </div>
+              </div>
+              <div class="message">
+                <strong>Admin alert</strong>
+                Ticket is routed to a human reviewer with a knowledge-base-grounded draft reply.
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <div class="wrap">
+          <h2>What The Automation Does</h2>
+          <p class="section-lead">
+            The system turns an unstructured customer message into a tracked operational ticket with
+            classification, routing, draft response, and audit visibility.
+          </p>
+          <div class="flow" aria-label="Workflow steps">
+            <div class="flow-step">
+              <b>1. Intake</b>
+              <span>Telegram trigger receives a customer support message through a webhook.</span>
+            </div>
+            <div class="flow-step">
+              <b>2. Normalize</b>
+              <span>n8n creates ticket IDs, timestamps, contact fields, and attachment metadata.</span>
+            </div>
+            <div class="flow-step">
+              <b>3. Classify</b>
+              <span>LLM or fallback logic classifies intent, department, sentiment, urgency, and risk.</span>
+            </div>
+            <div class="flow-step">
+              <b>4. Retrieve</b>
+              <span>Google Sheets knowledge base rows are matched against the message and ticket context.</span>
+            </div>
+            <div class="flow-step">
+              <b>5. Route</b>
+              <span>Low-risk replies go for approval; urgent or risky cases escalate to an admin.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="architecture">
+        <div class="wrap">
+          <h2>Architecture</h2>
+          <p class="section-lead">
+            Built as a low-code automation system with production-minded concerns: environment variables,
+            credential isolation, persistent storage, structured outputs, and audit logging.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>Workflow Runtime</h3>
+              <p>Self-hosted n8n runs locally with Docker Compose and persistent volume storage.</p>
+            </article>
+            <article class="card">
+              <h3>Integrations</h3>
+              <p>Telegram handles message intake and admin alerts. Google Sheets stores tickets, KB rows, and audit logs.</p>
+            </article>
+            <article class="card">
+              <h3>Automation Logic</h3>
+              <p>Code nodes parse JSON, match knowledge-base entries, and decide escalation or approval paths.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="outcomes">
+        <div class="wrap split">
+          <div>
+            <h2>Operational Outcomes</h2>
+            <p class="section-lead">
+              The project demonstrates automation engineering skills that map to internal tooling,
+              support operations, and DevOps-adjacent workflow integration.
+            </p>
+            <div class="callout">
+              In a simulated support workflow, first-pass triage is reduced to an automated classification,
+              knowledge-base lookup, and approval or escalation decision.
+            </div>
+          </div>
+          <div class="table" aria-label="Project outcomes table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Capability</th>
+                  <th>Implementation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Webhook intake</td>
+                  <td>Telegram trigger receives customer messages and starts the workflow.</td>
+                </tr>
+                <tr>
+                  <td>Structured data handling</td>
+                  <td>Ticket JSON is normalized and mapped into Google Sheets columns.</td>
+                </tr>
+                <tr>
+                  <td>Human review</td>
+                  <td>Draft replies are routed for approval; risky tickets are escalated.</td>
+                </tr>
+                <tr>
+                  <td>Observability</td>
+                  <td>Every major event writes to an Audit Log sheet with timestamps and event types.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <h2>Repository Artifacts</h2>
+          <p class="section-lead">
+            The public repository contains sanitized workflow exports and setup documentation. Credentials,
+            API keys, and private sheet URLs are intentionally excluded.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>Workflow Exports</h3>
+              <p>
+                <a href="workflows/ticket-intake-and-triage.sanitized.json">Ticket intake workflow</a>
+                and
+                <a href="workflows/admin-approval-commands.sanitized.json">admin command workflow</a>.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Build Docs</h3>
+              <p><a href="n8n-build-guide.md">n8n build guide</a>, data schema, prompts, and local Docker setup.</p>
+            </article>
+            <article class="card">
+              <h3>Portfolio Case Study</h3>
+              <p><a href="cv-case-study.md">CV-ready summary</a> explaining the problem, solution, and skills demonstrated.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        AI Customer Support Triage Desk. Built for automation engineering, internal tooling, and support operations workflows.
+      </div>
+    </footer>
+  </body>
+</html>
+

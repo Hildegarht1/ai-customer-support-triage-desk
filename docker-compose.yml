@@ -1,0 +1,20 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.26.5
+    container_name: ai-support-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      TZ: Europe/Berlin
+      GENERIC_TIMEZONE: Europe/Berlin
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_RUNNERS_ENABLED: "true"
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      WEBHOOK_URL: ${WEBHOOK_URL}
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
+    name: ai-support-n8n-data

@@ -1,0 +1,19 @@
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+credentials.json
+secrets.json
+
+# n8n exports may be shared only after credentials are removed.
+# Keep raw/private exports out of GitHub.
+workflows/*private*.json
+workflows/*credentials*.json
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
